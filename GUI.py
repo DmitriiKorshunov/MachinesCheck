@@ -1,7 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLineEdit, QInputDialog, QHBoxLayout, QVBoxLayout \
-    , QLabel, QSpinBox, QCheckBox, QComboBox
-from PyQt5 import QtGui
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 
 class GUI(QWidget):
@@ -12,17 +12,33 @@ class GUI(QWidget):
     def initUI(self):
 
     # Windows size
-        self.resize(800, 800)
-        self.move(300, 300)
+        self.setFixedSize(QSize(600,200))
         self.setWindowTitle('Machines repair')
-        self.setWindowIcon(QtGui.QIcon('./statics/oiler.ico'))
+        self.setWindowIcon(QIcon('./statics/oiler.ico'))
 
 
     # Labels
     #         Main Label
         self.mainLabel=QLabel()
-        self.mainLabel.setText("Электронная истема учета сроков ремонта машин")
-        self.mainLabel.move(100,100)
+        self.mainLabel.setText("Электронная cистема учета сроков ремонта машин.")
+        self.mainLabel.setFont(QFont('Arial',18))
+
+    # Field
+    #         Machines
+        self.
+
+    # Layouts
+
+    #         Vertical
+        self.hBox1 = QHBoxLayout()
+        self.hBox1.addWidget(self.mainLabel)
+        # self.hBox1.stretch(3)
+
+
+    #         Horizontal
+        self.vBox = QVBoxLayout()
+        self.vBox.addLayout(self.hBox1)
     #End
+        self.setLayout(self.vBox)
         self.show()
 
