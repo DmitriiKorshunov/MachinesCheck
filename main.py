@@ -1,13 +1,14 @@
+#!/venv/lib/python3.9
+# -*- coding: utf-8 -*-
+
 import sys
-from GUI import GUI
-from PyQt5.QtWidgets import QApplication, QWidget,  QPushButton, QLineEdit, QInputDialog, QHBoxLayout, QVBoxLayout\
-    ,QLabel, QSpinBox, QCheckBox, QComboBox
-from PyQt5 import QtGui
+from PyQt5.QtWidgets import *
+from GUI_widgets_window import MainWindow
 
 
 
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    gui = GUI()
+    gui = MainWindow()
     sys.exit(app.exec_())
