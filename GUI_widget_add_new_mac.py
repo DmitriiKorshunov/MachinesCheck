@@ -82,25 +82,47 @@ class NewAddMac(QWidget):
 
 
     def GetExistMachines(self):
-        self.name = self.machinesName.text()
-        self.comment = self.machinesComm.text()
-        self.nameList=ListAllMachine()
-        if len(self.nameList)>0:
-            for t in self.nameList:
-                if str(t[1])==self.name:
-                    msg = QMessageBox()
-                    msg.setIcon(QMessageBox.Critical)
-                    msg.setInformativeText('Вы попытались ввести существующее наименования машины, попробуйте ввести'
-                                           ' другое имя!')
-                    msg.setWindowTitle("Ошибка")
-                    msg.exec_()
-                    return()
-        result=AddNewMachine(self.name, self.comment)
-        if (result):
+        try:
+            self.name = self.machinesName.text()
+            if self.name == '':
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setInformativeText('При добавлении записи произошла ошибка! Укажите имя машины')
+                msg.setWindowTitle("Ошибка")
+                msg.exec_()
+                return ()
+            self.comment = self.machinesComm.text()
+            self.nameList=ListAllMachine()
+            if len(self.nameList)>0:
+                for t in self.nameList:
+                    if str(t[1])==self.name:
+                        msg = QMessageBox()
+                        msg.setIcon(QMessageBox.Critical)
+                        msg.setInformativeText('Вы попытались ввести существующее наименования машины, попробуйте ввести'
+                                               ' другое имя!')
+                        msg.setWindowTitle("Ошибка")
+                        msg.exec_()
+                        return()
+            result=AddNewMachine(self.name, self.comment)
+            if (result):
+                msg = QMessageBox()
+                msg.setInformativeText('Машина ' + str(self.name) + ' успешно добавлена!'
+                                       ' Не забудьте обновить базы данных (Правка->Обновить)!')
+                msg.setWindowTitle("Успешно")
+                msg.exec_()
+                return ()
+            else:
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Critical)
+                msg.setInformativeText('При добавлении записи произошла ошибка! \nКод ошибки: addnewmach/ORMFunc')
+                msg.setWindowTitle("Ошибка")
+                msg.exec_()
+                return ()
+        except:
             msg = QMessageBox()
-            msg.setInformativeText('Машина ' + str(self.name) + ' успешно добавлена!'
-                                   ' Не забудьте обновить базы данных (Правка->Обновить)!')
-            msg.setWindowTitle("Успешно")
+            msg.setIcon(QMessageBox.Critical)
+            msg.setInformativeText('При добавлении записи произошла ошибка! \nКод ошибки: addnewmach/ORMFunc')
+            msg.setWindowTitle("Ошибка")
             msg.exec_()
             return ()
 

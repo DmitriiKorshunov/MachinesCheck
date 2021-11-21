@@ -19,7 +19,7 @@ class GUI(QWidget):
         # Labels
         #         Main Label
         self.mainLabel = QLabel()
-        self.mainLabel.setText("Электронная cистема учета сроков ремонта машин.")
+        self.mainLabel.setText("Электронная cистема учета сроков ремонта машин")
         self.mainLabel.setFont(QFont('Arial', 18))
 
         #         Name Field 1
@@ -104,59 +104,106 @@ class GUI(QWidget):
         self.setLayout(self.vBox)
 
     def ItemsForCB(self):
-        self.items = list()
-        self.nameList = ListAllMachine()
-        if not (len(self.nameList) == 0):
-            for t in self.nameList:
-                self.items.append(str(t[1]))
-            self.MachinesCB.addItems(self.items)
-            return
-        else:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-            msg.setInformativeText('В базе данных не обнаружены записей о существующих машиных!'
-                                   'Добавьте новые машины (Ctrl+A).')
-            msg.setWindowTitle("Внимание!")
-            msg.exec_()
-            return
+        try:
+            self.items = list()
+            self.nameList = ListAllMachine()
+            if not (len(self.nameList) == 0):
+                for t in self.nameList:
+                    self.items.append(str(t.name))
+                self.MachinesCB.addItems(self.items)
+                return
+            else:
+                self.msg = QMessageBox()
+                self.msg.setIcon(QMessageBox.Warning)
+                self.msg.setInformativeText('В базе данных не обнаружены записей о существующих машинах! '
+                                       'Добавьте новые машины (Ctrl+A).')
+                self.msg.setWindowTitle("Внимание!")
+                self.msg.exec_()
+                return
+        except:
+            self.msg = QMessageBox()
+            self.msg.setIcon(QMessageBox.Critical)
+            self.msg.setInformativeText('Ошибка при обновлении базы ! Код ошибки: mainwidget/itemsforcb')
+            self.msg.setWindowTitle("Ошибка")
+            self.msg.exec_()
+            return ()
+
 
     def AddNewDateRepair(self):
-        self.name=self.MachinesCB.currentText()
-        self.dateFrom=self.repairFrom.dateTime()
-        self.dateFromText = self.dateFrom.toString('dd-MM-yyyy')
-        self.dateTo=self.repairTo.dateTime()
-        self.dateToText = self.dateTo.toString('dd-MM-yyyy')
-        self.comment = self.comm.text()
-        self.dateFromTextDay = self.dateFromText.split('-')[0]
-        self.dateFromTextMonth = self.dateFromText.split('-')[1]
-        self.dateFromTextYear = self.dateFromText.split('-')[2]
-        self.dateToTextDay = self.dateToText.split('-')[0]
-        self.dateToTextMonth = self.dateToText.split('-')[1]
-        self.dateToTextYear = self.dateToText.split('-')[2]
-        self.periodFrom = datetime.datetime(int(self.dateFromTextYear),
-                                            int(self.dateFromTextMonth),
-                                            int(self.dateFromTextDay))
-        self.periodTo = datetime.datetime(int(self.dateToTextYear),
-                                          int(self.dateToTextMonth),
-                                          int(self.dateToTextDay))
-        self.period = self.periodTo - self.periodFrom
-        print(type(self.period.days))
-        if self.period.days<0:
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Critical)
-            msg.setInformativeText('Дата окончания ремонта наступает перед датой его начала! '
-                                   'Проверьте данные ввода!')
-            msg.setWindowTitle("Ошибка")
-            msg.exec_()
-            return ()
-        else:
-            try:
-                AddNewRepair(self.name,self.dateFromText,self.dateToText,self.comment)
-            except:
+        # try:
+            self.name=self.MachinesCB.currentText()
+            self.dateFrom=self.repairFrom.dateTime()
+            self.dateFromText = self.dateFrom.toString('dd-MM-yyyy')
+            self.dateTo=self.repairTo.dateTime()
+            self.dateToText = self.dateTo.toString('dd-MM-yyyy')
+            self.comment = self.comm.text()
+            self.dateFromTextDay = self.dateFromText.split('-')[0]
+            self.dateFromTextMonth = self.dateFromText.split('-')[1]
+            self.dateFromTextYear = self.dateFromText.split('-')[2]
+            self.dateToTextDay = self.dateToText.split('-')[0]
+            self.dateToTextMonth = self.dateToText.split('-')[1]
+            self.dateToTextYear = self.dateToText.split('-')[2]
+            self.periodFrom = datetime.datetime(int(self.dateFromTextYear),
+                                                int(self.dateFromTextMonth),
+                                                int(self.dateFromTextDay))
+            self.periodTo = datetime.datetime(int(self.dateToTextYear),
+                                              int(self.dateToTextMonth),
+                                              int(self.dateToTextDay))
+            self.period = self.periodTo - self.periodFrom
+            if self.period.days<0:
                 msg = QMessageBox()
-                msg.setIcon(QMessageBox.Critical)
-                msg.setInformativeText('Ошибка при записи в базу данных. Попробуйте снова! Ошибка может быть связана с'
-                                       'некоректно выбранным именем.')
+                self.msg.setIcon(QMessageBox.Critical)
+                self.msg.setInformativeText('Дата окончания ремонта наступает перед датой его начала! '
+                                       'Проверьте данные ввода!')
                 msg.setWindowTitle("Ошибка")
                 msg.exec_()
                 return ()
+            else:
+                self.check_result =list(CheckExistItemsRepair(self.name, self.periodFrom, self.periodTo, self.comment))
+                if self.check_result[0]:
+                    if (AddNewRepair(self.name, self.dateFromText, self.dateToText, self.comment)):
+                        msg = QMessageBox()
+                        msg.setInformativeText('Изменения внесены в график ремонта!')
+                        msg.setWindowTitle("Успешно")
+                        msg.exec_()
+                    else:
+                        self.msg = QMessageBox()
+                        self.msg.setIcon(QMessageBox.Critical)
+                        self.msg.setInformativeText('Ошибка при записи в базу данных')
+                        self.msg.setWindowTitle("Ошибка")
+                        self.msg.exec_()
+                        return ()
+                else:
+                    .msg = QMessageBox()
+                    self.msg.setIcon(QMessageBox.Warning)
+                    self.msg.setWindowTitle('Внимание!')
+                    self.msg.setInformativeText(self.check_result[1])
+                    if self.check_result[2]:
+                        self.YesBtn = self.msg.addButton('Да', QMessageBox.ActionRole)
+                        self.NoBtn = self.msg.addButton('Нет', QMessageBox.ActionRole)
+                    else:
+                        ОкBtn = self.msg.addButton('ОК', QMessageBox.RejectRole)
+                    self.msg.exec()
+                    self.msg.deleteLater()
+                    if self.msg.clickedButton() == self.OkBtn:
+                        QCloseEvent()
+                    elif self.msg.clickedButton() == self.YesBtn:
+                        DeleteRepairUUID(self.check_result[3])
+                        AddNewRepair(self.name, self.dateFromText, self.dateToText, self.comment)
+                        QCloseEvent()
+                    elif msgBox.clickedButton() == self.NoBtn:
+                        QCloseEvent()
+
+
+        # except:
+        #         msg = QMessageBox()
+        #         msg.setIcon(QMessageBox.Critical)
+        #         msg.setInformativeText('Ошибка при записи в базу данных')
+        #         msg.setWindowTitle("Ошибка")
+        #         msg.exec_()
+        #         return ()
+
+
+
+
+
